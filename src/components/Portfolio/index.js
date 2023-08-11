@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import Loader from 'react-loaders'
 import AnimatedLetters from '../AnimatedLetters'
 import './index.scss'
-import 'react-responsive-carousel/lib/styles/carousel.min.css'
+// import 'react-responsive-carousel/lib/styles/carousel.min.css'
 
 import skillChainIcon from './../../assets/images/Screenshot (9).png'
 import devPointIcon from './../../assets/images/Screenshot (37).png'

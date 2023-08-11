@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import Loader from 'react-loaders'
 import AnimatedLetters from '../AnimatedLetters'
 import './index.scss'
-import 'react-responsive-carousel/lib/styles/carousel.min.css'
+// import 'react-responsive-carousel/lib/styles/carousel.min.css'
 
 import clgIcon from './../../assets/images/download.jpeg'
 import schoolIcon from './../../assets/images/Hibbing_High_School_2014.jpg'
