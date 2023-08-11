@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import Loader from 'react-loaders'
 import AnimatedLetters from '../AnimatedLetters'
 import './index.scss'
@@ -48,6 +48,7 @@ const Portfolio = () => {
               <a
                 className="flat-button"
                 target="_blank"
+                rel="noreferrer"
                 href="https://github.com/G12001/skillchain"
               >
                 Source Code
@@ -69,6 +70,7 @@ const Portfolio = () => {
               <a
                 className="flat-button"
                 target="_blank"
+                rel="noreferrer"
                 href="https://devpoint.onrender.com/"
               >
                 View
@@ -76,6 +78,7 @@ const Portfolio = () => {
               <a
                 className="flat-button"
                 target="_blank"
+                rel="noreferrer"
                 href="https://github.com/G12001/skillchain"
               >
                 Source Code
