@@ -67,13 +67,13 @@ export default function Home() {
   }, [messages]);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-4 md:p-12 relative overflow-hidden">
+    <main className="flex h-[100dvh] flex-col items-center justify-between p-4 md:p-12 relative overflow-hidden">
       {/* Background Glow */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-[120px] pointer-events-none" />
 
       {/* Main Chat Interface */}
-      <div className="w-full max-w-4xl flex flex-col h-[90vh] z-10">
+      <div className="w-full max-w-4xl flex flex-col h-full z-10">
         
         {/* Header / Empty State */}
         {(!messages || messages.length === 0) && (
@@ -95,7 +95,7 @@ export default function Home() {
 
         {/* Chat Messages */}
         {messages && messages.length > 0 && (
-          <div className="flex-1 overflow-y-auto w-full space-y-6 pb-6 scrollbar-hide px-4">
+          <div className="flex-1 overflow-y-auto min-h-0 w-full space-y-6 pb-6 scrollbar-hide px-4" data-lenis-prevent>
             <AnimatePresence>
               {messages && messages.map((m: any) => (
                 <motion.div
@@ -208,7 +208,7 @@ export default function Home() {
                 </motion.div>
               ))}
             </AnimatePresence>
-            {isLoading && (
+            {isLoading && (!messages || messages.length === 0 || messages[messages.length - 1]?.role === 'user' || (messages[messages.length - 1]?.role === 'assistant' && !messages[messages.length - 1]?.content && (!messages[messages.length - 1]?.parts || messages[messages.length - 1]?.parts?.length === 0))) && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -225,7 +225,7 @@ export default function Home() {
         )}
 
         {/* Input Area */}
-        <div className="w-full mt-auto pt-6 space-y-4">
+        <div className="w-full mt-auto pt-6 space-y-4 shrink-0">
           {/* Suggested Prompts */}
           {(!messages || messages.length === 0) && (
             <motion.div 
@@ -257,9 +257,10 @@ export default function Home() {
                 <Terminal size={20} />
               </div>
               <TextareaAutosize
-                className="flex-1 bg-transparent border-none outline-none p-3 text-lg placeholder:text-muted-foreground/50 focus:ring-0 resize-none max-h-[200px] scrollbar-hide"
+                className="flex-1 bg-transparent border-none outline-none p-3 text-lg placeholder:text-muted-foreground/50 focus:ring-0 resize-none max-h-[200px] scrollbar-hide disabled:opacity-50 disabled:cursor-not-allowed"
                 value={input || ""}
-                placeholder="Ask Shubham AI anything..."
+                placeholder={isLoading ? "Generating response..." : "Ask Shubham AI anything..."}
+                disabled={isLoading}
                 onChange={handleInputChange}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
@@ -274,7 +275,7 @@ export default function Home() {
                 disabled={isLoading || !(input || "").trim()}
                 className="p-3 bg-primary text-primary-foreground rounded-xl hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:hover:scale-100 flex items-center justify-center gap-2 font-medium"
               >
-                <Send size={18} />
+                {isLoading ? <div className="w-[18px] h-[18px] border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" /> : <Send size={18} />}
               </button>
             </div>
           </form>
@@ -294,6 +295,7 @@ export default function Home() {
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
             className="fixed inset-y-0 right-0 w-full md:w-[600px] bg-card border-l border-border/50 shadow-2xl z-50 p-8 overflow-y-auto"
+            data-lenis-prevent
           >
             <button onClick={() => setActiveView(null)} className="absolute top-6 right-6 p-2 bg-muted rounded-full hover:bg-muted/80">
               X
@@ -323,6 +325,7 @@ export default function Home() {
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
             className="fixed inset-0 bg-background z-50 p-4 md:p-12 overflow-y-auto"
+            data-lenis-prevent
           >
             <div className="max-w-6xl mx-auto relative">
               <button onClick={() => setActiveView(null)} className="absolute top-0 right-0 p-2 bg-muted rounded-full hover:bg-muted/80 z-10">
