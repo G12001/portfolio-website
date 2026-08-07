@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Send, Terminal, Code2, User, Sparkles } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import ArchitectureExplorer from "@/components/ArchitectureExplorer";
+import TraditionalPortfolio from "@/components/TraditionalPortfolio";
 import TextareaAutosize from "react-textarea-autosize";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -17,6 +18,7 @@ export default function Home() {
   const { messages, isLoading, sendMessage, append: chatAppend } = chat;
   const [input, setInput] = useState("");
   const [activeView, setActiveView] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"ai" | "traditional">("ai");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   const handleInputChange = (e: any) => setInput(e.target.value);
@@ -67,13 +69,60 @@ export default function Home() {
   }, [messages]);
 
   return (
-    <main className="flex h-[100dvh] flex-col items-center justify-between p-4 md:p-12 relative overflow-hidden">
-      {/* Background Glow */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-[120px] pointer-events-none" />
+    <>
+      {/* View Toggle Switch */}
+      <div className="fixed top-4 right-4 md:top-6 md:right-8 z-[100] flex items-center bg-card/80 border border-border/50 rounded-full p-1 backdrop-blur-md shadow-lg">
+        <button
+          onClick={() => setViewMode("ai")}
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
+            viewMode === "ai" 
+              ? "bg-primary text-primary-foreground shadow-md" 
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <Sparkles size={16} />
+          <span className="hidden sm:inline">AI Chat</span>
+        </button>
+        <button
+          onClick={() => setViewMode("traditional")}
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
+            viewMode === "traditional" 
+              ? "bg-[#74DF00] text-black shadow-md shadow-[#74DF00]/20" 
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <User size={16} />
+          <span className="hidden sm:inline">Portfolio</span>
+        </button>
+      </div>
 
-      {/* Main Chat Interface */}
-      <div className="w-full max-w-4xl flex flex-col h-full z-10">
+      <AnimatePresence mode="wait">
+        {viewMode === "traditional" ? (
+          <motion.div
+            key="traditional"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5 }}
+            className="w-full h-full"
+          >
+            <TraditionalPortfolio />
+          </motion.div>
+        ) : (
+          <motion.main 
+            key="ai"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5 }}
+            className="flex h-[100dvh] flex-col items-center justify-between p-4 md:p-12 relative overflow-hidden"
+          >
+            {/* Background Glow */}
+            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
+            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-[120px] pointer-events-none" />
+
+            {/* Main Chat Interface */}
+            <div className="w-full max-w-4xl flex flex-col h-full z-10">
         
         {/* Header / Empty State */}
         {(!messages || messages.length === 0) && (
@@ -374,7 +423,10 @@ export default function Home() {
         <FloatingCard delay={0.2} title="Tech Stack" value="Node.js, React, AWS" />
         <FloatingCard delay={0.4} title="Status" value={portfolioData.personalInfo.availability} />
       </div>
-    </main>
+    </motion.main>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
 
