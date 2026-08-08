@@ -71,7 +71,7 @@ export default function TraditionalPortfolio() {
           setShowNav(false);
         }
       }}
-      className="h-[100dvh] w-full overflow-y-auto bg-[#050816] text-white selection:bg-[#74DF00]/30 selection:text-white pb-12 relative"
+      className="h-[100dvh] w-full overflow-y-auto scrollbar-hide bg-[#050816] text-white selection:bg-[#74DF00]/30 selection:text-white pb-12 relative"
     >
       <div className="relative w-full">
         {/* Sticky Navbar (Hidden on Hero) */}
@@ -338,7 +338,7 @@ export default function TraditionalPortfolio() {
                           <motion.div 
                             initial={{ width: 0 }}
                             whileInView={{ width: `${Math.floor(Math.random() * 20) + 75}%` }}
-                            viewport={{ once: true, margin: "-100px" }}
+                            viewport={{ once: true, margin: "-10px" }}
                             transition={{ duration: 1.5, ease: "easeOut", delay: 0.2 }}
                             className="h-full rounded-full bg-gradient-to-r from-[#74DF00] to-[#5CE1E6] shadow-[0_0_10px_rgba(116,223,0,0.4)]"
                           />

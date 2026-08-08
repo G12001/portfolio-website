@@ -19,6 +19,7 @@ export default function Home() {
   const [input, setInput] = useState("");
   const [activeView, setActiveView] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"ai" | "traditional">("ai");
+  const [isGenerating, setIsGenerating] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   const handleInputChange = (e: any) => setInput(e.target.value);
@@ -26,12 +27,14 @@ export default function Home() {
     e.preventDefault();
     if (!input.trim()) return;
     const msg = { role: "user", content: input };
+    setIsGenerating(true);
     if (sendMessage) sendMessage(msg);
     else if (chatAppend) chatAppend(msg);
     setInput("");
   };
 
   const append = (msg: { role: string, content: string }) => {
+    setIsGenerating(true);
     if (sendMessage) sendMessage(msg);
     else if (chatAppend) chatAppend(msg);
   };
@@ -39,6 +42,12 @@ export default function Home() {
   useEffect(() => {
     if (!messages || messages.length === 0) return;
     const lastMsg: any = messages[messages.length - 1];
+    
+    // Check if assistant has started responding
+    if (lastMsg.role === 'assistant') {
+      setIsGenerating(false);
+    }
+    
     const toolParts = lastMsg.toolInvocations || lastMsg.parts?.filter((p: any) => p.type?.startsWith('tool-') || p.type === 'dynamic-tool' || p.type === 'tool-invocation') || [];
     if (toolParts.length > 0) {
       const lastTool = toolParts[toolParts.length - 1];
@@ -56,8 +65,7 @@ export default function Home() {
     "Explain your backend experience",
     "Show my best project",
     "Explain your architecture",
-    "Show my resume",
-    "Explain FleetLink"
+    "Show my resume"
   ];
 
   const scrollToBottom = () => {
@@ -66,7 +74,7 @@ export default function Home() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, isLoading, isGenerating]);
 
   return (
     <>
@@ -125,7 +133,7 @@ export default function Home() {
             <div className="w-full max-w-4xl flex flex-col h-full z-10">
         
         {/* Header / Empty State */}
-        {(!messages || messages.length === 0) && (
+        {(!messages || messages.length === 0) && !isLoading && !isGenerating && (
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -143,7 +151,7 @@ export default function Home() {
         )}
 
         {/* Chat Messages */}
-        {messages && messages.length > 0 && (
+        {(messages && messages.length > 0 || isLoading || isGenerating) && (
           <div className="flex-1 overflow-y-auto min-h-0 w-full space-y-6 pb-6 scrollbar-hide px-4" data-lenis-prevent>
             <AnimatePresence>
               {messages && messages.map((m: any) => (
@@ -257,7 +265,7 @@ export default function Home() {
                 </motion.div>
               ))}
             </AnimatePresence>
-            {isLoading && (!messages || messages.length === 0 || messages[messages.length - 1]?.role === 'user' || (messages[messages.length - 1]?.role === 'assistant' && !messages[messages.length - 1]?.content && (!messages[messages.length - 1]?.parts || messages[messages.length - 1]?.parts?.length === 0))) && (
+            {(isLoading || isGenerating) && (!messages || messages.length === 0 || messages[messages.length - 1]?.role === 'user' || (messages[messages.length - 1]?.role === 'assistant' && !messages[messages.length - 1]?.content && (!messages[messages.length - 1]?.parts || messages[messages.length - 1]?.parts?.length === 0))) && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -308,8 +316,8 @@ export default function Home() {
               <TextareaAutosize
                 className="flex-1 bg-transparent border-none outline-none p-3 text-lg placeholder:text-muted-foreground/50 focus:ring-0 resize-none max-h-[200px] scrollbar-hide disabled:opacity-50 disabled:cursor-not-allowed"
                 value={input || ""}
-                placeholder={isLoading ? "Generating response..." : "Ask Shubham AI anything..."}
-                disabled={isLoading}
+                placeholder={isLoading || isGenerating ? "Generating response..." : "Ask Shubham AI anything..."}
+                disabled={isLoading || isGenerating}
                 onChange={handleInputChange}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
@@ -321,10 +329,10 @@ export default function Home() {
               />
               <button
                 type="submit"
-                disabled={isLoading || !(input || "").trim()}
+                disabled={isLoading || isGenerating || !(input || "").trim()}
                 className="p-3 bg-primary text-primary-foreground rounded-xl hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:hover:scale-100 flex items-center justify-center gap-2 font-medium"
               >
-                {isLoading ? <div className="w-[18px] h-[18px] border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" /> : <Send size={18} />}
+                {isLoading || isGenerating ? <div className="w-[18px] h-[18px] border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" /> : <Send size={18} />}
               </button>
             </div>
           </form>
@@ -413,16 +421,6 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* Floating Info Cards (Desktop) */}
-      <div className="hidden lg:block absolute left-8 top-1/4 space-y-6">
-        <FloatingCard delay={0.1} title="Current Role" value={portfolioData.personalInfo.role} icon={<Code2 size={16}/>} />
-        <FloatingCard delay={0.3} title="Experience" value="2+ Years" />
-      </div>
-      
-      <div className="hidden lg:block absolute right-8 top-1/3 space-y-6">
-        <FloatingCard delay={0.2} title="Tech Stack" value="Node.js, React, AWS" />
-        <FloatingCard delay={0.4} title="Status" value={portfolioData.personalInfo.availability} />
-      </div>
     </motion.main>
         )}
       </AnimatePresence>
@@ -430,19 +428,3 @@ export default function Home() {
   );
 }
 
-function FloatingCard({ title, value, icon, delay = 0 }: { title: string, value: string, icon?: React.ReactNode, delay?: number }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: title.includes("Role") || title.includes("Exp") ? -50 : 50 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay, duration: 0.8, ease: "easeOut" }}
-      className="bg-card/50 border border-border/30 p-4 rounded-xl backdrop-blur-md shadow-xl w-64 transform hover:-translate-y-2 transition-transform duration-300"
-    >
-      <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-1 flex items-center gap-2">
-        {icon}
-        {title}
-      </div>
-      <div className="text-sm font-medium">{value}</div>
-    </motion.div>
-  );
-}
