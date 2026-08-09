@@ -15,7 +15,7 @@ export const portfolioData = {
     {
       company: "Thinkitive Technologies",
       role: "Software Engineer",
-      duration: "Dec 2025 - Apr 2026",
+      duration: "Dec 2025 - Present",
       location: "Baner, Pune",
       description: "Engineered scalable RESTful APIs for an enterprise HRMS module managing complex employee self-service lifecycles. Developed core ledger logic for real-time attendance calculations and authored comprehensive unit/integration test suites using Jest. Optimized multi-tenant EHR platform reliability by fixing race conditions and built structured analytical report export endpoints to minimize server memory overhead.",
       technologies: ["Node.js", "TypeScript", "Jest", "RESTful APIs", "Microservices"],
